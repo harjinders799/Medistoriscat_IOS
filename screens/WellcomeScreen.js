@@ -3,10 +3,13 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Dim
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFontSize } from '../utils';
+import { createRStyle, useResponsiveMethods } from 'react-native-full-responsive';
 
 const window = Dimensions.get('window');
 
 const WellcomeScreen = ({ navigation }) => {
+  const { rs, rw, rh } = useResponsiveMethods();
+
   const [loading, setLoading] = useState(false);
 
   const handlePress = async () => {
@@ -35,7 +38,7 @@ const WellcomeScreen = ({ navigation }) => {
           {loading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text style={{ color: 'white',fontSize:getFontSize(10) }}>Entra</Text>
+            <Text style={styles.txt}>Entra</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -43,7 +46,7 @@ const WellcomeScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = createRStyle({
   gradient: {
     flex: 1,
   },
@@ -51,17 +54,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '5%',
+    padding: '5rs',
     width: '100%'
   },
   logo: {
     width: '50%',
     height: window.height * 0.2,
     resizeMode: 'contain',
-    marginBottom: '5%'
+    marginBottom: '5rs'
   },
   title: {
-    fontSize: getFontSize(10),  // Dynamic font size
+    fontSize: '14rs',
     color: '#ffffff',
     marginBottom: '5%'
   },
@@ -73,5 +76,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '80%',
   },
+  txt:{ color: 'white',fontSize:'10rs' }
 });
 export default WellcomeScreen;

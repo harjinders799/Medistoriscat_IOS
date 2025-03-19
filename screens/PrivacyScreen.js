@@ -10,10 +10,13 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
+import { useResponsiveMethods } from 'react-native-full-responsive';
 
 
 
 const PrivacyScreen = ({navigation})=> {
+  const { rs, rw, rh } = useResponsiveMethods();
+
     const [isChecked, setIsChecked] = useState(false);
     return (
         <SafeAreaView>

@@ -26,11 +26,36 @@ import TrackPlayer, {
   useTrackPlayerEvents,
 } from 'react-native-track-player';
 import { getFontSize } from '../utils'; // Responsive font utility
+import { rh, rs, useResponsiveMethods } from 'react-native-full-responsive';
 
-const setupPlayer = async () => {
-  await TrackPlayer.setupPlayer();
-  await TrackPlayer.add(LegendsongsList);
-  await TrackPlayer.setRepeatMode(RepeatMode.Track);
+const setupPlayer = async (initialIndex = 0) => {
+  try {
+    const currentTrack = await TrackPlayer.getCurrentTrack();
+    if (currentTrack !== null) {
+      await TrackPlayer.reset();
+    }
+
+    await TrackPlayer.setupPlayer({
+      waitForBuffer: true,
+      autoUpdateMetadata: true,
+      minBuffer: 5, // Increase buffer size
+      maxBuffer: 15,
+      playBuffer: 3
+    });
+
+    await TrackPlayer.updateOptions({
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+      ],
+    });
+
+    await TrackPlayer.add([...LegendsongsList.slice(initialIndex), ...LegendsongsList.slice(0, initialIndex)]);
+  } catch (error) {
+    console.log('Error setting up player:', error);
+  }
 };
 
 const togglePlayback = async (playbackState) => {
@@ -45,17 +70,26 @@ const togglePlayback = async (playbackState) => {
 };
 
 const LegendsSongsPlayScreens = ({ navigation, route }) => {
-  const { selectedIndex } = route.params;
+  const { rs, rw, rh } = useResponsiveMethods();
+  const { selectedIndex = 0 } = route.params || {};
   const playbackState = usePlaybackState();
   const { position, duration } = useProgress();
   const scrollX = useRef(new Animated.Value(0)).current;
   const [songIndex, setSongIndex] = useState(0);
   const songSlider = useRef(null);
+  const isInitialMount = useRef(true);
+  const songs = [...LegendsongsList.slice(selectedIndex), ...LegendsongsList.slice(0, selectedIndex)]
 
   // Skip to a given track and start playing (if desired)
   const skipTo = async (trackId) => {
-    await TrackPlayer.skip(trackId);
-    await TrackPlayer.play(); // Auto-play once we skip
+    try {
+      console.log("Skipping to track ID:", trackId);
+      await TrackPlayer.skip(trackId);
+      await TrackPlayer.play();
+      setSongIndex(trackId);
+    } catch (error) {
+      console.log("Error in skipTo:", error);
+    }
   };
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
@@ -81,35 +115,56 @@ const LegendsSongsPlayScreens = ({ navigation, route }) => {
 
   // Set up the player once on mount
   useEffect(() => {
-    const startPlayer = async () => {
-      await setupPlayer();
-      await skipTo(selectedIndex);
-      setSongIndex(selectedIndex);
-      songSlider.current?.scrollToOffset({
-        offset: selectedIndex * width,
-        animated: true,
-      });
-    };
-    startPlayer();
+    let isMounted = true;
 
-    // Clean up scroll listeners on unmount
+    const startPlayer = async () => {
+      try {
+        await TrackPlayer.reset();
+        await setupPlayer(selectedIndex);
+
+        if (isMounted) {
+          await TrackPlayer.play();
+
+          setTimeout(() => {
+            if (songSlider.current) {
+              songSlider.current.scrollToOffset({
+                offset: songIndex * width,
+                animated: false,
+              });
+            }
+          }, 200);
+        }
+      } catch (error) {
+        console.log('Error starting player:', error);
+      }
+    };
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      startPlayer();
+    } else {
+      skipTo(0);
+    }
+
     return () => {
+      isMounted = false;
       scrollX.removeAllListeners();
     };
-  }, []);
+  }, [selectedIndex]);
 
   const skipToNext = async () => {
     let nextIndex = songIndex + 1;
-    if (nextIndex >= LegendsongsList.length) {
-      nextIndex = 0; // wrap around to the first track
+    if (nextIndex >= songs.length) {
+      nextIndex = 0;
     }
+    console.log('next index', nextIndex)
     try {
-      await skipTo(nextIndex);
-      setSongIndex(nextIndex);
-      songSlider.current?.scrollToOffset({
-        offset: nextIndex * width,
-        animated: true,
-      });
+      if (songSlider.current) {
+        songSlider.current.scrollToOffset({
+          offset: nextIndex * width,
+          animated: true,
+        });
+      }
     } catch (error) {
       console.log("Error skipping to next track:", error);
     }
@@ -118,15 +173,15 @@ const LegendsSongsPlayScreens = ({ navigation, route }) => {
   const skipToPrevious = async () => {
     let previousIndex = songIndex - 1;
     if (previousIndex < 0) {
-      previousIndex = LegendsongsList.length - 1; // wrap around to the last track
+      previousIndex = songs.length - 1;
     }
     try {
-      await skipTo(previousIndex);
-      setSongIndex(previousIndex);
-      songSlider.current?.scrollToOffset({
-        offset: previousIndex * width,
-        animated: true,
-      });
+      if (songSlider.current) {
+        songSlider.current.scrollToOffset({
+          offset: previousIndex * width,
+          animated: true,
+        });
+      }
     } catch (error) {
       console.log("Error skipping to previous track:", error);
     }
@@ -136,21 +191,20 @@ const LegendsSongsPlayScreens = ({ navigation, route }) => {
   const onScrollEnd = async (event) => {
     const offset = event.nativeEvent.contentOffset.x;
     const newIndex = Math.round(offset / width);
-
-    // Only skip if we've actually changed track index
-    if (newIndex !== songIndex) {
+    console.log('new index', newIndex, songIndex)
+    // Only change if index is different and valid
+    if (newIndex !== songIndex && newIndex >= 0 && newIndex < songs.length) {
       await skipTo(newIndex);
-      setSongIndex(newIndex);
     }
   };
 
   const renderSongs = ({ index, item }) => {
     return (
-      <Animated.View style={styles.animatedview}>
-        <View style={styles.artworkWrapper}>
-          <Image source={item.artwork} style={styles.artworkimage} />
-        </View>
-      </Animated.View>
+      <Animated.View style={{ width: width, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.artworkWrapper}>
+        <Image source={item?.artwork} style={[styles.artworkimage,{height:rh(40)}]} resizeMode='contain' />
+      </View>
+    </Animated.View>
     );
   };
 
@@ -167,14 +221,14 @@ const LegendsSongsPlayScreens = ({ navigation, route }) => {
   }, [position, duration]);
 
   return (
-    <LinearGradient colors={["#d9d600", "#760075"]} style={{ flex: 1, paddingBottom: 20 }}>
+    <LinearGradient colors={["#d9d600", "#760075"]} style={{ flex: 1}}>
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
         <SafeAreaView style={{ flex: 1 }}>
           <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => navigation.goBack()}>
             <Image
               source={require("../images/back-white.webp")}
-              style={{ height: 50, width: 50, marginLeft: 15, tintColor: 'black' }}
+              style={{ height: rs(20), width: rs(20), marginLeft: rs(15), tintColor: 'black' }}
             />
           </TouchableOpacity>
 
@@ -183,7 +237,7 @@ const LegendsSongsPlayScreens = ({ navigation, route }) => {
             <View style={{ width: width }}>
               <Animated.FlatList
                 ref={songSlider}
-                data={LegendsongsList}
+                data={songs}
                 renderItem={renderSongs}
                 keyExtractor={(item) => item.id.toString()}
                 horizontal
@@ -199,18 +253,13 @@ const LegendsSongsPlayScreens = ({ navigation, route }) => {
             </View>
 
             {/* Song Title & Artist */}
-            <View style={styles.titleView}>
-              <Text
-                allowFontScaling={false}
-                style={[styles.title, { marginBottom: 10 }]}
-              >
-                {LegendsongsList[songIndex].title}
+            
+            <View style={{ marginTop: 5, width: width, paddingHorizontal:'5%' }}>
+              <Text allowFontScaling={false} style={[styles.title, { marginBottom: rs(10),fontSize:rs(20) }]}>
+                {songs && songIndex >= 0 ? songs[songIndex].title : 'Loading...'}
               </Text>
-              <Text
-                allowFontScaling={false}
-                style={styles.artist}
-              >
-                {LegendsongsList[songIndex].artist}
+              <Text allowFontScaling={false} style={[styles.artist,{fontSize:rs(14)}]}>
+                {songs && songIndex >= 0 ? songs[songIndex].artist : 'Loading...'}
               </Text>
             </View>
 
@@ -228,10 +277,10 @@ const LegendsSongsPlayScreens = ({ navigation, route }) => {
                 }}
               />
               <View style={styles.progressLabelContainer}>
-                <Text allowFontScaling={false} style={styles.progressLebelText}>
-                  {new Date(position * 1000).toISOString().substr(14, 5)}
+              <Text allowFontScaling={false} style={[styles.progressLebelText,{fontSize:rs(12)}]}>
+              {new Date(position * 1000).toISOString().substr(14, 5)}
                 </Text>
-                <Text allowFontScaling={false} style={styles.progressLebelText}>
+                <Text allowFontScaling={false} style={[styles.progressLebelText,{fontSize:rs(12)}]}>
                   {new Date((duration - position) * 1000).toISOString().substr(14, 5)}
                 </Text>
               </View>
@@ -240,29 +289,23 @@ const LegendsSongsPlayScreens = ({ navigation, route }) => {
             {/* Playback Controls */}
             <View style={styles.musicControls}>
               <TouchableOpacity onPress={skipToPrevious} style={styles.skipButton}>
-                <Ionicons name="play-skip-back-outline" size={35} color="black" />
+                <Ionicons name="play-skip-back-outline" size={rs(28)} color="black" />
               </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => togglePlayback(playbackState)}
-                style={styles.playButton}
-              >
+              <TouchableOpacity onPress={() => togglePlayback(playbackState)} style={styles.playButton}>
                 <Ionicons
                   name={playbackState === State.Playing ? "pause-circle" : "play-circle"}
-                  size={75}
+                  size={rs(65)}
                   color="black"
                 />
               </TouchableOpacity>
-
               <TouchableOpacity onPress={skipToNext} style={styles.skipButton}>
-                <Ionicons name="play-skip-forward-outline" size={35} color="black" />
+                <Ionicons name="play-skip-forward-outline" size={rs(28)} color="black" />
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={styles.queueIconContainer}
                 onPress={() => navigation.navigate('AllSongsListScreen')}
               >
-                <MaterialIcons name="queue-music" size={35} color="#000000" />
+                <MaterialIcons name="queue-music" size={rs(28)} color="#000000" />
               </TouchableOpacity>
             </View>
           </View>
@@ -285,18 +328,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   artworkWrapper: {
-    width: 350,
-    height: 340,
-    marginBottom: 25,
+    width: '100%',
+    justifyContent:'center',
+    alignItems:'center',
+    height: rh(42),
+    marginBottom: rs(25),
     shadowColor: 'black',
     shadowOffset: { width: 5, height: 5 },
     shadowOpacity: 0.5,
     shadowRadius: 3.84,
+    borderRadius: 15,
+    overflow:'hidden'
   },
   artworkimage: {
-    height: '100%',
-    width: '100%',
+    width: '90%',
     borderRadius: 15,
+    overflow:'hidden'
   },
   title: {
     fontSize: getFontSize(25),
@@ -309,12 +356,12 @@ const styles = StyleSheet.create({
     color: '#EEEEEEE',
   },
   progressContainer: {
-    width: 350,
+    width: width/1.1,
     height: 40,
     marginTop: 25,
   },
   progressLabelContainer: {
-    width: 340,
+    width: width/1.1,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -341,15 +388,5 @@ const styles = StyleSheet.create({
     right: 30,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  titleView: {
-    marginTop: 5,
-    width: width,
-    marginLeft: 70,
-  },
-  animatedview: {
-    width: width,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });

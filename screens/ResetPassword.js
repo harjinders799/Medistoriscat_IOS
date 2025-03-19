@@ -3,8 +3,11 @@ import { View, Text, TextInput, StyleSheet, Alert, Button, TouchableOpacity } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import auth from '@react-native-firebase/auth';
 import { getFontSize } from '../utils';
+import { useResponsiveMethods } from 'react-native-full-responsive';
 
 const ResetPassword = ({ navigation }) => {
+  const { rs, rw, rh } = useResponsiveMethods();
+
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,18 +34,18 @@ const ResetPassword = ({ navigation }) => {
     <SafeAreaView style={styles.SafeAreaView}>
       <View style={styles.container}>
 
-        <Text style={styles.title}>Restablir Contrasenya</Text>
-        <Text style={styles.description}>
+        <Text style={[styles.title,{fontSize:rs(20)}]}>Restablir Contrasenya</Text>
+        <Text style={[styles.description,{fontSize:rs(14)}]}>
           Introdueix el teu correu electrònic i rebràs instruccions
           per restablir la contrasenya.
         </Text>
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer,{height:rs(40)}]}>
           <TextInput
             placeholder="Email"
             placeholderTextColor={"black"}
             keyboardType="email-address"
-            style={styles.input}
+            style={[styles.input,{fontSize:rs(14)}]}
             value={email}
             onChangeText={text => setEmail(text.toLowerCase())}
           />
@@ -50,7 +53,7 @@ const ResetPassword = ({ navigation }) => {
 
         <View style={{ justifyContent: 'center', alignItems: 'center', }}>
           <TouchableOpacity style={styles.Button} onPress={handlePasswordReset}>
-            <Text style={{ color: 'white',    fontSize: getFontSize(18), }}>Continuar</Text>
+            <Text style={{ color: 'white',    fontSize: rs(18), }}>Continuar</Text>
           </TouchableOpacity>
         </View>
 
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '100%',
-    height: getFontSize(50), borderColor: "black",
+    borderColor: "black",
     borderWidth: 1,
     borderRadius: 8,
     alignItems: 'center',
