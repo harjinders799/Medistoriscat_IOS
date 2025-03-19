@@ -18,13 +18,24 @@ import CanconsSongsListScreen from './screens/CanconsSongsListScreen';
 import AllSongsListScreen from './screens/AllSongsListScreen';
 import AllSongsPlayScreen from './screens/AllSongsPlayScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { FRProvider, useMediaQuery } from 'react-native-full-responsive';
 
 
 
 const Stack = createStackNavigator();
+const customThresholds = {
+  // 'xs':768 ,992,1200,
+  'sm':992 ,
+  'md':1200 ,
+};
 
 const App = () => {
+  const type = useMediaQuery(customThresholds);
+
   return (
+    <FRProvider type={type}>
+    <SafeAreaProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Wellcome">
 
@@ -61,6 +72,8 @@ const App = () => {
      
       </Stack.Navigator>
     </NavigationContainer>
+    </SafeAreaProvider>
+    </FRProvider>
   );
 };
 

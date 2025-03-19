@@ -11,100 +11,44 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import { LegendsongsList } from "../ScreenSongs/LegendsongsList";
 import { getFontSize } from "../utils"; // Responsive font utility
+import OptimiseList from "./optimiseList";
+import { useResponsiveMethods } from "react-native-full-responsive";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Header from "./header";
 
 const LegendsSongsListScreen = ({ navigation }) => {
+  const { rs, rw, rh } = useResponsiveMethods();
+
   return (
     <LinearGradient
       colors={["rgba(189,0,138,0.49)", "#bd008a"]}
-      style={{ flex: 1, paddingBottom: 20 }}
+      style={{ flex: 1 }}
     >
-      <View style={{
-        flexDirection: "row",
-        marginTop: Platform.OS === "ios" ? 50 : 50,
-        paddingHorizontal: 10,
-        borderBottomWidth: 0.2,
-        paddingBottom: 10,
-      }}>
-        <TouchableOpacity
-          style={{ flexDirection: "row" }}
-          onPress={() => navigation.goBack()}
-        >
-          <Image
-            source={require("../images/back-white.webp")}
-            style={{ height: 50, width: 50, marginRight: 6 }}
-          />
-        </TouchableOpacity>
-        <Text
-          allowFontScaling={false}
-          style={styles.medistories_cat}
-        >
-          Medistoris.cat
-        </Text>
-      </View>
+    <SafeAreaView>
+<Header title={'Medistoris.cat'}/>
 
       <View style={{ flexDirection: "row", paddingLeft: 20, marginTop: 20 }}>
         <Text
           allowFontScaling={false}
-          style={{ color: "white", fontSize: getFontSize(24), marginLeft: 0 }}
+          style={{ color: "white", fontSize: rs(20), marginLeft: 0 }}
         >
           Llegendes immersives
         </Text>
       </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          width: "90%",
-          marginTop: 10,
-          justifyContent: "space-between",
-          alignSelf: "center",
-        }}
-      />
-
       <FlatList
         data={LegendsongsList}
-        style={{ paddingBottom: 50, flex: 1 }}
         scrollEnabled={true}
         keyExtractor={(item, index) => index.toString()}
         ItemSeparatorComponent={<View style={{ height: 1 }} />}
-        renderItem={({ item, index }) => {
-          return (
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("LegendsSongsPlayScreens", {
-                  selectedIndex: index,
-                })
-              }
-              style={styles.FirstTouchebleopacity}
-              activeOpacity={1}
-            >
-              <View style={styles.firstView}>
-                <View style={[styles.imageContainer, styles.shadowProp]}>
-                  <Image source={item.artwork} style={styles.image} />
-                </View>
-                <View style={{ paddingLeft: 10, paddingRight: 10 }}>
-                  <Text
-                    allowFontScaling={false}
-                    style={{ color: "white", fontSize: getFontSize(16), width: "100%" }}
-                    adjustsFontSizeToFit={true}
-                    numberOfLines={1}
-                  >
-                    {item.title}
-                  </Text>
-                  <View style={styles.artistView}>
-                    <Text
-                      allowFontScaling={false}
-                      style={styles.itemartist}
-                    >
-                      {item.artist}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          );
-        }}
+        renderItem={({ item, index }) => <OptimiseList item={item}
+            onPress={() => navigation.navigate("LegendsSongsPlayScreens", { selectedIndex: index })}
+          />}
+          contentContainerStyle={{ paddingBottom: rh(20) }}
+
       />
+      </SafeAreaView>
+
     </LinearGradient>
   );
 };

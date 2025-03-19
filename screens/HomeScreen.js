@@ -19,9 +19,11 @@ import LinearGradient from "react-native-linear-gradient";
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { getFontSize } from "../utils"; // responsive font function
+import { getFontSize, getSpacing, isTablet } from "../utils"; // responsive font function
+import { createRStyle, useResponsiveMethods } from "react-native-full-responsive";
 
 const HomeScreen = ({ navigation }) => {
+  const { rs, rw, rh } = useResponsiveMethods(); 
 
   const onDeleteAccount = () => {
     Alert.alert(
@@ -74,17 +76,13 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.headerContainer}>
           <Text
             allowFontScaling={false}
-            style={{
-              fontSize: getFontSize(22),
-              color: "#ffffff",
-              fontWeight: "500",
-            }}
+            style={[styles.headerText, {fontSize:rs(20)}] }
           >
             Medistoris.cat
           </Text>
 
           <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
-            <Ionicons name='person-circle-outline' size={40} color='white' />
+            <Ionicons name='person-circle-outline' size={rs(30)} color='white' />
           </Pressable>
         </View>
 
@@ -113,7 +111,7 @@ const HomeScreen = ({ navigation }) => {
             <View>
               <Text
                 allowFontScaling={false}
-                style={styles.boxText}
+                style={[styles.boxText, {fontSize:rs(14)}]}
               >
                 Històries immersives
               </Text>
@@ -134,7 +132,7 @@ const HomeScreen = ({ navigation }) => {
             <View>
               <Text
                 allowFontScaling={false}
-                style={styles.boxText}
+                style={[styles.boxText, {fontSize:rs(14)}]}
               >
                 Llegendes immersives
               </Text>
@@ -154,7 +152,7 @@ const HomeScreen = ({ navigation }) => {
             </View>
             <Text
               allowFontScaling={false}
-              style={styles.boxText}
+              style={[styles.boxText, {fontSize:rs(14)}]}
             >
               Dites
             </Text>
@@ -173,7 +171,7 @@ const HomeScreen = ({ navigation }) => {
             </View>
             <Text
               allowFontScaling={false}
-              style={styles.boxText}
+              style={[styles.boxText, {fontSize:rs(14)}]}
             >
               Cançons populars Catalanes
             </Text>
@@ -189,7 +187,7 @@ const HomeScreen = ({ navigation }) => {
           >
               <Text
                 allowFontScaling={false}
-                style={styles.totalBtnText}
+                style={[styles.totalBtnText,{fontSize:rs(12)}]}
               >
                 Escolta tots els àudios
               </Text>
@@ -203,7 +201,7 @@ const HomeScreen = ({ navigation }) => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({
+const styles = createRStyle({
   container: {
     flex: 1,
     justifyContent: "space-between",
@@ -212,16 +210,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal:'10rs',
+    marginTop:isTablet() ? 50 : 0
+  },
+  headerText:{
+    fontSize: '22rs',
+    color: "#ffffff",
+    fontWeight: "500",
   },
   logoContainer: {
-    height: 100,
+    // height: '10rh',
     justifyContent: "center",
     alignItems: "center",
   },
   logoImg: {
-    width: 260,
-    height: 100,
+    width: '100%',
+    height: '22rw',
     marginTop: 10,
   },
   boxContainer: {
@@ -244,37 +248,37 @@ const styles = StyleSheet.create({
   imageContainer: {
     justifyContent: "center",
     alignItems: "center",
-    margin: 10,
+    margin: getSpacing(8),
     borderRadius: 10,
     paddingBottom: 3,
   },
   image: {
     aspectRatio: 1,
     flex: 1,
-    height: "100%",
+    height: getSpacing(100),
     borderRadius: 10,
   },
   boxText: {
-    fontSize: getFontSize(16),
+    fontSize: 16,
     color: "white",
     fontWeight: "bold",
   },
   totalContainer: {
-    marginTop: 10,
+    marginTop: '10rs',
     justifyContent: "center",
     alignItems: "center",
   },
   totalButton: {
     width: '60%',
     justifyContent: "center",
-    padding:10,
+    padding:'10rs',
     alignItems: "center",
     backgroundColor: "#bf00a8",
     borderRadius: 5,
-    paddingHorizontal:20,
+    paddingHorizontal:'20rs',
   },
   totalBtnText: {
-    fontSize: getFontSize(15),
+    fontSize: 15,
     color: "white",
     fontWeight: "bold",
   },

@@ -20,11 +20,13 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFontSize } from '../utils';
+import { useResponsiveMethods } from 'react-native-full-responsive';
 
 
 
 
 const LoginScreen = ({ navigation }) => {
+  const { rs, rw, rh } = useResponsiveMethods();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,7 +59,7 @@ const LoginScreen = ({ navigation }) => {
         <View style={{ marginVertical: 22, width: '100%' }}>
           <Text
             style={{
-              fontSize: getFontSize(22),
+              fontSize: rs(20),
               fontWeight: 'bold',
               marginVertical: 12,
               color: 'black',
@@ -67,7 +69,7 @@ const LoginScreen = ({ navigation }) => {
 
           <Text
             style={{
-              fontSize: getFontSize(16),
+              fontSize: rs(14),
               color: 'black',
             }}>
             Ens alegrem de tornar-te a veure 👋
@@ -79,7 +81,7 @@ const LoginScreen = ({ navigation }) => {
             style={{
               width: '100%',
               // height: 50,
-              height: getFontSize(50),
+              height: rs(40),
               borderColor: 'black',
               borderWidth: 1,
               borderRadius: 8,
@@ -94,7 +96,7 @@ const LoginScreen = ({ navigation }) => {
               onChangeText={setEmail}
               style={{
                 width: '100%',
-                fontSize: getFontSize(16),
+                fontSize: rs(14),
               }}
             />
           </View>
@@ -104,7 +106,7 @@ const LoginScreen = ({ navigation }) => {
           <View
             style={{
               width: '100%',
-              height: getFontSize(50),
+              height: rs(40),
               borderColor: 'black',
               borderWidth: 1,
               borderRadius: 8,
@@ -120,7 +122,7 @@ const LoginScreen = ({ navigation }) => {
               onChangeText={setPassword}
               style={{
                 width: '100%',
-                fontSize: getFontSize(16),
+                fontSize: rs(14),
               }}
             />
             <TouchableOpacity
@@ -130,9 +132,9 @@ const LoginScreen = ({ navigation }) => {
                 right: 12,
               }}>
               {isPasswordShown == false ? (
-                <Ionicons name="eye-off" size={24} color={"blak"} />
+                <Ionicons name="eye-off" size={rs(24)} color={"blak"} />
               ) : (
-                <Ionicons name="eye" size={24} color={"black"} />
+                <Ionicons name="eye" size={rs(24)} color={"black"} />
               )}
             </TouchableOpacity>
           </View>
@@ -147,7 +149,7 @@ const LoginScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.navigate("ResetPassword")}>
             <Text
               style={{
-                fontSize: getFontSize(19),
+                fontSize: rs(15),
                 color: '#007260',
                 fontWeight: 'bold',
                 marginLeft: 6,
@@ -159,7 +161,7 @@ const LoginScreen = ({ navigation }) => {
 
         <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%' }}>
           <TouchableOpacity style={styles.Button} onPress={handleLogin} >
-            <Text style={{ color: 'white', justifyContent: 'center', alignItems: 'center', fontSize: getFontSize(18)}}>Inicia sessió</Text>
+            <Text style={{ color: 'white', justifyContent: 'center', alignItems: 'center', fontSize: rs(18)}}>Inicia sessió</Text>
           </TouchableOpacity>
         </View>
 
@@ -169,11 +171,11 @@ const LoginScreen = ({ navigation }) => {
             justifyContent: 'center',
             marginVertical: 22,
           }}>
-          <Text style={{ fontSize: getFontSize(16), color: 'black' }}>No tens compte</Text>
+          <Text style={{ fontSize: rs(14), color: 'black' }}>No tens compte</Text>
           <Pressable onPress={() => navigation.navigate("Signup")}>
             <Text
               style={{
-                fontSize: getFontSize(16),
+                fontSize: rs(14),
                 color: '#007260',
                 fontWeight: 'bold',
                 marginLeft: 6,
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
     width:'100%' ,
     marginTop: 18,
     marginBottom: 4,
-    height: 52,
+    // height: 52,
     justifyContent: 'center', alignItems: 'center',
 
   },

@@ -5,8 +5,11 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFontSize } from '../utils';
+import { useResponsiveMethods } from 'react-native-full-responsive';
 
 const ProfileScreen = ({ navigation }) => {
+  const { rs, rw, rh } = useResponsiveMethods();
+
 
   const onLogout = async () => {
     try {
@@ -72,18 +75,18 @@ const ProfileScreen = ({ navigation }) => {
         <StatusBar translucent backgroundColor={"transparent"} barStyle='light-content' />
 
         <View style={styles.header}>
-          <Ionicons name='person-circle-outline' size={70} color='white' />
-          <Text style={{ fontSize: getFontSize(32), fontWeight: '600', Merginbuttom: 6, color: 'white', marginTop: 10, }}>Perfil</Text>
+          <Ionicons name='person-circle-outline' size={rs(70)} color='white' />
+          <Text style={{ fontSize: rs(32), fontWeight: '600', Merginbuttom: 6, color: 'white', marginTop: 10, }}>Perfil</Text>
 
           <View>
-            <TouchableOpacity style={styles.Button} onPress={onDeleteAccount} >
-              <Text style={{ color: 'white', justifyContent: 'center', alignItems: 'center', fontSize: getFontSize(18) }}>suprimeix el teu compte</Text>
+            <TouchableOpacity style={[styles.Button,{ width:rw(80)}]} onPress={onDeleteAccount} >
+              <Text style={{ color: 'white', justifyContent: 'center', alignItems: 'center', fontSize: rs(18) }}>suprimeix el teu compte</Text>
             </TouchableOpacity>
           </View>
 
 
-          <TouchableOpacity style={styles.Button} onPress={onLogout} >
-            <Text style={{ color: 'white', justifyContent: 'center', alignItems: 'center', fontSize: getFontSize(18) }}>tancar sessió</Text>
+          <TouchableOpacity style={[styles.Button,{ width:rw(80)}]} onPress={onLogout} >
+            <Text style={{ color: 'white', justifyContent: 'center', alignItems: 'center', fontSize: rs(18) }}>tancar sessió</Text>
           </TouchableOpacity>
         </View>
 
@@ -110,10 +113,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     marginTop: 20,
-    width: getFontSize(350),
+    // width: getFontSize(350),
     marginTop: 18,
     marginBottom: 4,
-    height: 52,
+    // height: 52,
     justifyContent: 'center', alignItems: 'center',
 
   },

@@ -21,6 +21,7 @@ import firestore from '@react-native-firebase/firestore';
 
 import { FIREBASE_API_KEY, FIREBASE_PROJECT_ID, FIREBASE_APP_ID, GOOGLE_SIGNIN_WEB_CLINT_ID } from '@env';
 import { getFontSize } from "../utils";
+import { useResponsiveMethods } from "react-native-full-responsive";
 
 
 
@@ -39,6 +40,7 @@ if (!firebase.apps.length) {
 }
 
 const SignupScreen = ({ navigation, route }) => {
+  const { rs, rw, rh } = useResponsiveMethods();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -118,7 +120,7 @@ const SignupScreen = ({ navigation, route }) => {
         <View style={{ marginVertical: 22 }}>
           <Text
             style={{
-              fontSize: getFontSize(22),
+              fontSize: rs(22),
               fontWeight: "bold",
               marginVertical: 12,
               color: "black",
@@ -132,7 +134,7 @@ const SignupScreen = ({ navigation, route }) => {
           <View
             style={{
               width: "100%",
-              height: getFontSize(50),
+              height: rs(40),
               borderColor: 'black',
               borderWidth: 1,
               borderRadius: 8,
@@ -148,7 +150,7 @@ const SignupScreen = ({ navigation, route }) => {
               onChangeText={(text) => setName(text)}
               style={{
                 width: "100%",
-                fontSize: getFontSize(16),
+                fontSize: rs(14),
               }}
             />
           </View>
@@ -157,7 +159,7 @@ const SignupScreen = ({ navigation, route }) => {
           <View
             style={{
               width: "100%",
-              height: getFontSize(50),
+              height: rs(40),
               borderColor: "black",
               borderWidth: 1,
               borderRadius: 8,
@@ -174,7 +176,7 @@ const SignupScreen = ({ navigation, route }) => {
               onChangeText={(text) => setEmail(text.toLowerCase())}
               style={{
                 width: "100%",
-                fontSize: getFontSize(16),
+                fontSize: rs(14),
 
               }}
             />
@@ -185,7 +187,7 @@ const SignupScreen = ({ navigation, route }) => {
           <View
             style={{
               width: "100%",
-              height: getFontSize(50),
+              height: rs(40),
               borderColor: "black",
               borderWidth: 1,
               borderRadius: 8,
@@ -202,7 +204,7 @@ const SignupScreen = ({ navigation, route }) => {
               onChangeText={(text) => setPassword(text)}
               style={{
                 width: "100%",
-                fontSize: getFontSize(16),
+                fontSize: rs(14),
 
               }}
             />
@@ -216,7 +218,7 @@ const SignupScreen = ({ navigation, route }) => {
             >
               <Ionicons
                 name={isPasswordShown ? "eye-off" : "eye"}
-                size={24}
+                size={rs(24)}
                 color={"black"}
               />
             </TouchableOpacity>
@@ -239,7 +241,7 @@ const SignupScreen = ({ navigation, route }) => {
 
           <Text
             style={{
-              width: '100%', fontSize: getFontSize(16),
+              width: '100%', fontSize: rs(14),
             }}
             onPress={() =>
               navigation.navigate("PrivacyScreen", { isChecked: isChecked })
@@ -261,12 +263,12 @@ const SignupScreen = ({ navigation, route }) => {
             width: '100%',
             marginTop: 18,
             marginBottom: 4,
-            height: 52,
+            // height: 52,
             justifyContent: 'center', alignItems: 'center',
 
           }}
         >
-          <Text style={{ color: "white", fontSize: getFontSize(18) }}>Registra't</Text>
+          <Text style={{ color: "white", fontSize: rs(18) }}>Registra't</Text>
         </TouchableOpacity>
         {/* <View
           style={{
@@ -350,13 +352,13 @@ const SignupScreen = ({ navigation, route }) => {
             marginVertical: 22,
           }}
         >
-          <Text style={{ fontSize: getFontSize(16), color: "black" }}>
+          <Text style={{ fontSize: rs(14), color: "black" }}>
             Si tens un compte
           </Text>
           <Pressable onPress={() => navigation.navigate("Login")}>
             <Text
               style={{
-                fontSize: getFontSize(16),
+                fontSize: rs(14),
                 color: "#007260",
                 fontWeight: "bold",
                 marginLeft: 6,
