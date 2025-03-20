@@ -11,62 +11,34 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import { AllsongsList } from "../ScreenSongs/AllSongs";
 import { getFontSize } from "../utils";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { rs, useResponsiveMethods } from "react-native-full-responsive";
+import OptimiseList from "./optimiseList";
+import Header from "./header";
 
 const AllSongsListScreen = ({ navigation }) => {
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.itemContainer}
-      onPress={() => navigation.navigate("AllSongsPlayScreen")}
-      activeOpacity={1}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <View style={[styles.imageContainer, styles.shadowProp]}>
-          <Image source={item.artwork} style={styles.image} />
-        </View>
-        <View style={{ paddingLeft: 10, paddingRight: 10 }}>
-          <Text
-            allowFontScaling={false}
-            style={{ color: "white", fontSize: getFontSize(20), width: "100%" }}
-            adjustsFontSizeToFit={true}
-            numberOfLines={1}
-          >
-            {item.title}
-          </Text>
-          <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
-            <Text allowFontScaling={false} style={styles.artistText}>
-              {item.artist}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+  const { rs, rw, rh } = useResponsiveMethods();
 
   return (
     <LinearGradient colors={["#b88c08", "#60045f"]} style={styles.gradient}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => navigation.goBack()}>
-          <Image
-            source={require("../images/back-white.webp")}
-            style={styles.backImage}
-          />
-        </TouchableOpacity>
-        <Text allowFontScaling={false} style={styles.headerText}>
-          Medistoris.cat
-        </Text>
-      </View>
+      <SafeAreaView>
+      <Header title={'Medistoris.cat'}/>
 
-      <View style={styles.titleContainer}>
-        <Text allowFontScaling={false} style={styles.title}>
-          Àudios
-        </Text>
-      </View>
+        <View style={styles.titleContainer}>
+          <Text allowFontScaling={false} style={[styles.title, { fontSize: rs(20) }]}>
+            Àudios
+          </Text>
+        </View>
 
-      <FlatList
-        data={AllsongsList}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
+        <FlatList
+          data={AllsongsList}
+          renderItem={({ item, index }) => <OptimiseList item={item}
+            onPress={() => navigation.navigate("AllSongsPlayScreen", { selectedIndex: index })}
+          />}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: rh(20) }}
+        />
+      </SafeAreaView>
     </LinearGradient>
   );
 };
@@ -74,26 +46,27 @@ const AllSongsListScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   gradient: {
     flex: 1,
-    paddingBottom: 20,
+    // paddingBottom: 20,
   },
   headerContainer: {
-    flexDirection: "row",
-    marginTop: Platform.OS === "ios" ? 50 : 50,
+    // flexDirection: "row",
+    alignItems: "center",
+
+    // marginTop: Platform.OS === "ios" ? 50 : 50,
     paddingHorizontal: 10,
-    borderBottomWidth: 0.2,
+    borderBottomWidth: rs(0.2),
     paddingBottom: 10,
   },
   backImage: {
-    height: 50,
-    width: 50,
-    marginRight: 6,
+    height: getFontSize(20),
+    width: getFontSize(20),
   },
   headerText: {
     fontSize: getFontSize(18),
     color: "#ffffff",
     fontWeight: "500",
-    marginLeft: "20%",
-    marginTop: 10,
+    // marginLeft: "20%",
+    // marginTop: 10,
   },
   titleContainer: {
     flexDirection: "row",
